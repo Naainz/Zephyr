@@ -26,7 +26,7 @@ class Zephyr(QMainWindow):
             }
         """)
         navbar.setIconSize(QSize(16, 16))
-        main_layout.addWidget(navbar)  # Add the navbar at the top
+        main_layout.addWidget(navbar)
 
         back_btn = QAction('⬅️', self)
         back_btn.triggered.connect(lambda: self.current_browser().back())
@@ -71,7 +71,7 @@ class Zephyr(QMainWindow):
         self.tabs.setStyleSheet("""
             QTabWidget::pane { 
                 position: relative;
-                top: -12px; /* Move the tabs up into the URL bar */
+                top: -12px;
                 background: none;
             }
             QTabBar::tab {
@@ -82,9 +82,9 @@ class Zephyr(QMainWindow):
                 border-bottom-right-radius: 10px;
                 padding: 8px;
                 margin-right: 2px;
-                margin-bottom: 0px; /* Prevent clipping */
+                margin-bottom: 0px;
                 min-width: 150px;
-                text-align: center; /* Center text */
+                text-align: center;
                 vertical-align: middle;
                 height: 30px;
                 transition: background 0.3s, transform 0.3s;
@@ -92,11 +92,11 @@ class Zephyr(QMainWindow):
             QTabBar::tab:selected {
                 background: white;
                 border-color: #DADCE0;
-                transform: translateY(-5px); /* Lift the selected tab slightly */
+                transform: translateY(-5px);
             }
             QTabBar::tab:hover {
                 background: #F8F9FA;
-                transform: translateY(-2px); /* Slight lift on hover */
+                transform: translateY(-2px);
             }
         """)
 
@@ -108,6 +108,12 @@ class Zephyr(QMainWindow):
         self.add_new_tab(QUrl("http://www.google.com"), 'Home')
 
         self.showMaximized()
+
+        new_tab_shortcut = QShortcut(QKeySequence('Ctrl+T'), self)
+        new_tab_shortcut.activated.connect(self.add_new_tab)
+
+        close_tab_shortcut = QShortcut(QKeySequence('Ctrl+W'), self)
+        close_tab_shortcut.activated.connect(lambda: self.close_current_tab(self.tabs.currentIndex()))
 
     def add_new_tab(self, qurl=None, label="New Tab"):
         if qurl is None or isinstance(qurl, bool):
