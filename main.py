@@ -115,6 +115,14 @@ class Zephyr(QMainWindow):
         close_tab_shortcut = QShortcut(QKeySequence('Ctrl+W'), self)
         close_tab_shortcut.activated.connect(lambda: self.close_current_tab(self.tabs.currentIndex()))
 
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Tab and event.modifiers() == Qt.ControlModifier:
+            self.next_tab()
+        elif event.key() == Qt.Key_Tab and event.modifiers() == (Qt.ControlModifier | Qt.ShiftModifier):
+            self.previous_tab()
+        else:
+            super().keyPressEvent(event)
+
     def add_new_tab(self, qurl=None, label="New Tab"):
         if qurl is None or isinstance(qurl, bool):
             qurl = QUrl("http://www.google.com")
@@ -132,6 +140,16 @@ class Zephyr(QMainWindow):
     def close_current_tab(self, i):
         if self.tabs.count() > 1:
             self.tabs.removeTab(i)
+
+    def next_tab(self):
+        current_index = self.tabs.currentIndex()
+        next_index = (current_index + 1) % self.tabs.count()
+        self.tabs.setCurrentIndex(next_index)
+
+    def previous_tab(self):
+        current_index = self.tabs.currentIndex()
+        prev_index = (current_index - 1) % self.tabs.count()
+        self.tabs.setCurrentIndex(prev_index)
 
     def current_browser(self):
         return self.tabs.currentWidget()
