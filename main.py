@@ -1,14 +1,25 @@
 import sys
+import os
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtWebEngineWidgets import QWebEngineView
-from PyQt5.QtGui import *
-
+from PyQt5.QtGui import QFontDatabase, QFont, QKeySequence
 
 class Zephyr(QMainWindow):
 
     def __init__(self):
         super().__init__()
+
+        # Load Font Awesome using an absolute path
+        ttf_path = os.path.join(os.path.dirname(__file__), 'fa-solid-900.ttf')
+        font_id = QFontDatabase.addApplicationFont(ttf_path)
+        if font_id != -1:
+            font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
+            self.fa_font = QFont(font_family)
+            self.fa_font.setPointSize(12)
+        else:
+            print("Failed to load Font Awesome")
+            sys.exit(-1)
 
         central_widget = QWidget()
         main_layout = QVBoxLayout()
@@ -28,21 +39,29 @@ class Zephyr(QMainWindow):
         navbar.setIconSize(QSize(16, 16))
         main_layout.addWidget(navbar)
 
-        back_btn = QAction('⬅️', self)
-        back_btn.triggered.connect(lambda: self.current_browser().back())
-        navbar.addAction(back_btn)
+        # Back button using QPushButton
+        back_btn = QPushButton("\uf053", self)  # FontAwesome arrow-left icon
+        back_btn.setFont(self.fa_font)
+        back_btn.clicked.connect(lambda: self.current_browser().back())
+        navbar.addWidget(back_btn)
 
-        forward_btn = QAction('➡️', self)
-        forward_btn.triggered.connect(lambda: self.current_browser().forward())
-        navbar.addAction(forward_btn)
+        # Forward button using QPushButton
+        forward_btn = QPushButton("\uf054", self)  # FontAwesome arrow-right icon
+        forward_btn.setFont(self.fa_font)
+        forward_btn.clicked.connect(lambda: self.current_browser().forward())
+        navbar.addWidget(forward_btn)
 
-        reload_btn = QAction('⟳', self)
-        reload_btn.triggered.connect(lambda: self.current_browser().reload())
-        navbar.addAction(reload_btn)
+        # Reload button using QPushButton
+        reload_btn = QPushButton("\uf021", self)  # FontAwesome sync icon
+        reload_btn.setFont(self.fa_font)
+        reload_btn.clicked.connect(lambda: self.current_browser().reload())
+        navbar.addWidget(reload_btn)
 
-        home_btn = QAction('🏠', self)
-        home_btn.triggered.connect(self.navigate_home)
-        navbar.addAction(home_btn)
+        # Home button using QPushButton
+        home_btn = QPushButton("\uf015", self)  # FontAwesome home icon
+        home_btn.setFont(self.fa_font)
+        home_btn.clicked.connect(self.navigate_home)
+        navbar.addWidget(home_btn)
 
         self.url_bar = QLineEdit()
         self.url_bar.setStyleSheet("""
@@ -56,9 +75,11 @@ class Zephyr(QMainWindow):
         self.url_bar.returnPressed.connect(self.navigate_to_url)
         navbar.addWidget(self.url_bar)
 
-        new_tab_btn = QAction('+', self)
-        new_tab_btn.triggered.connect(self.add_new_tab)
-        navbar.addAction(new_tab_btn)
+        # New tab button using QPushButton
+        new_tab_btn = QPushButton("\uf067", self)  # FontAwesome plus icon
+        new_tab_btn.setFont(self.fa_font)
+        new_tab_btn.clicked.connect(self.add_new_tab)
+        navbar.addWidget(new_tab_btn)
 
         self.tabs = QTabWidget()
         self.tabs.setDocumentMode(True)
@@ -68,6 +89,7 @@ class Zephyr(QMainWindow):
         self.tabs.tabCloseRequested.connect(self.close_current_tab)
         self.tabs.currentChanged.connect(self.update_url_bar)
 
+        # Remove unsupported properties: transition and transform
         self.tabs.setStyleSheet("""
             QTabWidget::pane { 
                 position: relative;
@@ -87,16 +109,13 @@ class Zephyr(QMainWindow):
                 text-align: center;
                 vertical-align: middle;
                 height: 30px;
-                transition: background 0.3s, transform 0.3s;
             }
             QTabBar::tab:selected {
                 background: white;
                 border-color: #DADCE0;
-                transform: translateY(-5px);
             }
             QTabBar::tab:hover {
                 background: #F8F9FA;
-                transform: translateY(-2px);
             }
         """)
 
@@ -109,6 +128,7 @@ class Zephyr(QMainWindow):
 
         self.showMaximized()
 
+        # Ensure QKeySequence is imported and used correctly
         new_tab_shortcut = QShortcut(QKeySequence('Ctrl+T'), self)
         new_tab_shortcut.activated.connect(self.add_new_tab)
 
